@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>BaseViewModel specs</title>
+		<link rel="stylesheet" type="text/css" href="../../js/components/jasmine/lib/jasmine-core/jasmine.css">
+	</head>
+	<body>
+		<!-- scripts -->
+		<script src="../../js/components/jasmine/lib/jasmine-core/jasmine.js"></script>
+		<script src="../../js/components/jasmine/lib/jasmine-core/jasmine-html.js"></script>
+		<script src="../../js/components/requirejs/require.js"></script>
+		<script>
+			require(["../../js/common"], function (common) {
+				var jasmineEnv = jasmine.getEnv();
+				var htmlReporter = new jasmine.HtmlReporter();
+
+				jasmineEnv.addReporter(htmlReporter);
+
+				jasmineEnv.specFilter = function (spec) {
+					return htmlReporter.specFilter(spec);
+				};
+
+				require(["specs/baseViewModel/BaseViewModel.spec"], function (BaseViewModelSpec) {
+					jasmineEnv.execute();
+				});
+			});
+		</script>
+	</body>
+</html>

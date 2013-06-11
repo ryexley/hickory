@@ -1,0 +1,9 @@
+{
+  "name": "knockout-amd-helpers",
+  "version": "0.0.0",
+  "commit": "b245581b4a8820ecaab62b5778f566598963ea0a",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rniemeyer/knockout-amd-helpers.git"
+  }
+}
