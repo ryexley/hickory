@@ -119,7 +119,7 @@ define([
       var self = this;
 
       // Initialize Knockout observable properties
-      _.each(this.defaults, function (value, prop) {
+      _.each(self.defaults, function (value, prop) {
         if (_.isFunction(value)) {
           self[prop] = ko.computed(self.defaults[prop], self);
         } else {
@@ -135,8 +135,41 @@ define([
         }
       });
 
+      self._commands = {};
+      _.each(self.commands, function (commandData, commandName) {
+        var command = {};
+        _.each(commandData, function (value, key) {
+          command[key] = self._executeOptions[key](value, self);
+        });
+
+        self._commands[commandName] = command;
+        self.commands[commandName] = { type: "_commands", name: commandName };
+      });
+
+      self._queries = {};
+      _.each(self.queries, function (queryData, queryName) {
+        var query = {};
+        _.each(queryData, function (value, key) {
+          query[key] = self._executeOptions[key](value, self);
+        });
+
+        self._queries[queryName] = query;
+        self.queries[queryName] = { type: "_queries", name: queryName };
+      });
+
       this.configureMessaging();
       ko.amdTemplateEngine.defaultPath = this.templatePath;
+    },
+
+    // TODO: revisit this...not sure if I'm doing this right or not
+    _executeOptions: {
+      url: function (target, context) {
+        return target;
+      },
+
+      done: function (target, context) {
+        return context[target];
+      }
     },
 
     bind: function (bindings, el) {
@@ -148,12 +181,15 @@ define([
     },
 
     execute: function (params) {
+      var self = this;
+      params = this[params.type][params.name];
+
       var request = $.ajax({
         url: params.url,
         type: params.type || "get",
         data: params.data || {},
         contentType: params.contentType || "application/json; charset=utf-8",
-        context: params.context || this
+        context: params.context || self // TODO: need to figure out why context isn't getting set correctly here
       })
       .done(function (data) {
         if (params.done) {

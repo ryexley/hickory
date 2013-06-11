@@ -31,12 +31,11 @@ define([
 				queries: {
 					ajaxTest1: {
 						url: "/baseviewmodel/test1",
-						done: this.ajaxTest1Complete
+						done: "ajaxTest1Complete"
 					}
 				},
 
-				initialize: function () {
-				},
+				initialize: function () {},
 
 				ajaxTest1: function () {
 					this.execute(this.queries.ajaxTest1);
