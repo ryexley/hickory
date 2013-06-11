@@ -1,7 +1,9 @@
 define([
+	"jquery",
 	"knockout",
-	"core/BaseViewModel"
-], function (ko, BaseViewModel) {
+	"core/BaseViewModel",
+	"mockjax"
+], function ($, ko, BaseViewModel) {
 
 	describe("BaseViewModel", function () {
 
@@ -10,10 +12,9 @@ define([
 
 		beforeEach(function () {
 			TestViewModel = BaseViewModel.extend({
-				// BEGIN test variables: these properties exist for the purpose of testing only
-				messagesPublished: [],
-				messagesHandled: [],
-				// END test variables
+				// Test variables
+				ajaxCallbacks: [],
+				// END Test variables
 
 				channelName: "testChannel",
 
@@ -24,20 +25,25 @@ define([
 					notes: []
 				},
 
-				messages: {
-					"initialized": "testChannel initialized"
+				commands: {
 				},
 
-				subscriptions: {
-					"onInitialized": "initialized"
+				queries: {
+					ajaxTest1: {
+						url: "/baseviewmodel/test1",
+						done: this.ajaxTest1Complete
+					}
 				},
 
 				initialize: function () {
-					this.trigger("initialized");
 				},
 
-				onInitialized: function (data, envelope) {
-					this.messagesHandled.push("onInitialized");
+				ajaxTest1: function () {
+					this.execute(this.queries.ajaxTest1);
+				},
+
+				ajaxTest1Complete: function (data) {
+					this.ajaxCallbacks.push("onTest1Complete");
 				}
 			});
 
@@ -58,14 +64,15 @@ define([
 			expect(ko.isObservable(_testViewModel.notes)).toBeTruthy();
 		});
 
-		it("should support postal messaging", function () {
-			expect(_testViewModel.messaging).toBeDefined();
-		});
+		it("should handle ajax callbacks", function () {
+			$.mockjax({
+				url: "/baseviewmodel/test1",
+				responseText: { message: "Test 1 ajax call complete" }
+			});
 
-		it("should publish an \"initialized\" message on construction", function () {
-			spyOn(_testViewModel, "onInitialized");
-			expect(_testViewModel.onInitialized).toHaveBeenCalled();
-			expect(_testViewModel.messagesHandled[0]).toEqual("onInitialized");
+			spyOn(_testViewModel, "ajaxTest1Complete");
+			_testViewModel.ajaxTest1();
+			expect(_testViewModel.ajaxTest1Complete).toHaveBeenCalled();
 		});
 
 	});
