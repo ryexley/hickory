@@ -6,10 +6,15 @@ define([
 	describe("BaseViewModel", function () {
 
 		var TestViewModel;
-		var testVm;
+		var _testViewModel;
 
 		beforeEach(function () {
 			TestViewModel = BaseViewModel.extend({
+				// BEGIN test variables: these properties exist for the purpose of testing only
+				messagesPublished: [],
+				messagesHandled: [],
+				// END test variables
+
 				channelName: "testChannel",
 
 				defaults: {
@@ -24,33 +29,43 @@ define([
 				},
 
 				subscriptions: {
-
+					"onInitialized": "initialized"
 				},
 
 				initialize: function () {
 					this.trigger("initialized");
+				},
+
+				onInitialized: function (data, envelope) {
+					this.messagesHandled.push("onInitialized");
 				}
 			});
 
-			testVm = new TestViewModel({});
+			_testViewModel = new TestViewModel({});
 		});
 
 		it("should initialize default properties", function () {
-			expect(testVm.id).toBeDefined();
-			expect(testVm.name).toBeDefined();
-			expect(testVm.description).toBeDefined();
-			expect(testVm.notes).toBeDefined();
+			expect(_testViewModel.id).toBeDefined();
+			expect(_testViewModel.name).toBeDefined();
+			expect(_testViewModel.description).toBeDefined();
+			expect(_testViewModel.notes).toBeDefined();
 		});
 
 		it("default properties should be observable", function () {
-			expect(ko.isObservable(testVm.id)).toBeTruthy();
-			expect(ko.isObservable(testVm.name)).toBeTruthy();
-			expect(ko.isObservable(testVm.description)).toBeTruthy();
-			expect(ko.isObservable(testVm.notes)).toBeTruthy();
+			expect(ko.isObservable(_testViewModel.id)).toBeTruthy();
+			expect(ko.isObservable(_testViewModel.name)).toBeTruthy();
+			expect(ko.isObservable(_testViewModel.description)).toBeTruthy();
+			expect(ko.isObservable(_testViewModel.notes)).toBeTruthy();
 		});
 
 		it("should support postal messaging", function () {
-			expect(testVm.messaging).toBeDefined();
+			expect(_testViewModel.messaging).toBeDefined();
+		});
+
+		it("should publish an \"initialized\" message on construction", function () {
+			spyOn(_testViewModel, "onInitialized");
+			expect(_testViewModel.onInitialized).toHaveBeenCalled();
+			expect(_testViewModel.messagesHandled[0]).toEqual("onInitialized");
 		});
 
 	});
