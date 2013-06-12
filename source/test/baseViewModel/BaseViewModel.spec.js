@@ -1,9 +1,13 @@
 define([
 	"jquery",
 	"knockout",
-	"core/BaseViewModel",
-	"mockjax"
-], function ($, ko, BaseViewModel) {
+	"chai",
+	"mockjax",
+	"core/BaseViewModel"
+], function ($, ko, chai, mockjax, BaseViewModel) {
+
+	var expect = chai.expect;
+	var should = chai.should;
 
 	describe("BaseViewModel", function () {
 
@@ -50,28 +54,21 @@ define([
 		});
 
 		it("should initialize default properties", function () {
-			expect(_testViewModel.id).toBeDefined();
-			expect(_testViewModel.name).toBeDefined();
-			expect(_testViewModel.description).toBeDefined();
-			expect(_testViewModel.notes).toBeDefined();
+			expect(_testViewModel.id).to.exist;
+			expect(_testViewModel.name).to.exist;
+			expect(_testViewModel.description).to.exist;
+			expect(_testViewModel.notes).to.exist;
 		});
 
 		it("default properties should be observable", function () {
-			expect(ko.isObservable(_testViewModel.id)).toBeTruthy();
-			expect(ko.isObservable(_testViewModel.name)).toBeTruthy();
-			expect(ko.isObservable(_testViewModel.description)).toBeTruthy();
-			expect(ko.isObservable(_testViewModel.notes)).toBeTruthy();
+			expect(ko.isObservable(_testViewModel.id)).to.be.true;
+			expect(ko.isObservable(_testViewModel.name)).to.be.true;
+			expect(ko.isObservable(_testViewModel.description)).to.be.true;
+			expect(ko.isObservable(_testViewModel.notes)).to.be.true;
 		});
 
-		it("should handle ajax callbacks", function () {
-			$.mockjax({
-				url: "/baseviewmodel/test1",
-				responseText: { message: "Test 1 ajax call complete" }
-			});
-
-			spyOn(_testViewModel, "ajaxTest1Complete");
-			_testViewModel.ajaxTest1();
-			expect(_testViewModel.ajaxTest1Complete).toHaveBeenCalled();
+		it("should have queries defined", function () {
+			expect(_testViewModel._queries).to.exist;
 		});
 
 	});

@@ -2,26 +2,19 @@
 <html>
 	<head>
 		<title>BaseViewModel specs</title>
-		<link rel="stylesheet" type="text/css" href="../../js/components/jasmine/lib/jasmine-core/jasmine.css">
+		<link rel="stylesheet" type="text/css" href="../../js/components/mocha/mocha.css">
 	</head>
 	<body>
+		<div id="mocha"></div>
 		<!-- scripts -->
-		<script src="../../js/components/jasmine/lib/jasmine-core/jasmine.js"></script>
-		<script src="../../js/components/jasmine/lib/jasmine-core/jasmine-html.js"></script>
+		<script src="../../js/components/mocha/mocha.js"></script>
+		<script src="../../js/components/chai/chai.js"></script>
 		<script src="../../js/components/requirejs/require.js"></script>
 		<script>
+			mocha.setup("bdd");
 			require(["../../js/common"], function (common) {
-				var jasmineEnv = jasmine.getEnv();
-				var htmlReporter = new jasmine.HtmlReporter();
-
-				jasmineEnv.addReporter(htmlReporter);
-
-				jasmineEnv.specFilter = function (spec) {
-					return htmlReporter.specFilter(spec);
-				};
-
 				require(["specs/baseViewModel/BaseViewModel.spec"], function (BaseViewModelSpec) {
-					jasmineEnv.execute();
+					mocha.run();
 				});
 			});
 		</script>

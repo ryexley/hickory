@@ -189,21 +189,21 @@ define([
         type: params.type || "get",
         data: params.data || {},
         contentType: params.contentType || "application/json; charset=utf-8",
-        context: params.context || self // TODO: need to figure out why context isn't getting set correctly here
+        context: params.context || self
       })
       .done(function (data) {
         if (params.done) {
-          params.done(data);
+          params.done.call(params.context || self, data);
         }
       })
       .fail(function (data) {
         if (params.fail) {
-          params.fail(data);
+          params.fail.call(params.context || self, data);
         }
       })
       .always(function (data) {
         if (params.always) {
-          params.always(data);
+          params.always.call(params.context || self, data);
         }
       });
 

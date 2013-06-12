@@ -12,6 +12,7 @@ requirejs.config({
 		circular: "app/circular",
 		text: "components/requirejs-text/text",
 		templates: "../templates",
+		chai: "components/chai/chai",
 		specs: "../test"
 	},
 	shim: {
