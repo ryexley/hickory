@@ -9,7 +9,6 @@ requirejs.config({
 		postal: "components/postaljs/lib/postal",
 		mockjax: "components/jquery-mockjax/jquery.mockjax",
 		core: "app/core",
-		circular: "app/circular",
 		text: "components/requirejs-text/text",
 		templates: "../templates",
 		chai: "components/chai/chai",
