@@ -184,6 +184,8 @@ define([
       var self = this;
       params = this[params.type][params.name];
 
+      // TODO: pull the callback functions out of this...they should be defined in child classes as follows:
+      // this.execute(params).done(...).fail(...).always(...);
       var request = $.ajax({
         url: params.url,
         type: params.type || "get",
