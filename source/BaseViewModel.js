@@ -5,9 +5,9 @@ define([
   "knockout", /* http://knockoutjs.com/ */
   "knockoutAmd", /* https://github.com/rniemeyer/knockout-amd-helpers */
   "postal", /* https://github.com/postaljs/postal.js */
-  "core/messenger", /* ./messenger.js */
-  "core/events", /* ./events.js */
-  "core/extend" /* ./extend.js */
+  "messenger", /* ./messenger.js */
+  "events", /* ./events.js */
+  "extend" /* ./extend.js */
 ], function ($, _, ko, koAmd, postal, messenger, events, extend) {
 
   "use strict";
@@ -167,8 +167,8 @@ define([
         return target;
       },
 
-      done: function (target, context) {
-        return context[target];
+      data: function (target, context) {
+        return target;
       }
     },
 
