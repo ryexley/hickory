@@ -9,6 +9,7 @@ requirejs.config({
 		postal: "components/postaljs/lib/postal",
 		text: "components/requirejs-text/text",
 		chai: "components/chai/chai",
+		sinon: "../node_modules/sinon/pkg/sinon-1.7.2",
 		spec: "../spec"
 	},
 	shim: {
@@ -21,6 +22,9 @@ requirejs.config({
 		},
 		knockout: {
 			exports: "knockout"
+		},
+		sinon: {
+			exports: "sinon"
 		}
 	}
 });

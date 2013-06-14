@@ -11,6 +11,7 @@
     "postaljs": "https://github.com/postaljs/postal.js.git",
     "json2": "latest",
     "mocha": "~1.11.0",
-    "chai": "~1.6.1"
+    "chai": "~1.6.1",
+    "sinon": "~1.7.1"
   }
 }

@@ -1,15 +1,19 @@
 define([
+	"jquery",
 	"knockout",
 	"chai",
+	"sinon",
 	"BaseViewModel"
-], function (ko, chai, BaseViewModel) {
+], function ($, ko, chai, sinon, BaseViewModel) {
 
+	var assert = chai.assert;
 	var expect = chai.expect;
 	var should = chai.should;
 
 	describe("BaseViewModel", function () {
 		var TestViewModel;
 		var _testViewModel;
+		var mockAjaxCall;
 
 		beforeEach(function () {
 			TestViewModel = BaseViewModel.extend({
@@ -29,12 +33,25 @@ define([
 
 				queries: {
 					testQuery1: {
-						url: "http://example.com"
+						url: "http://example.com",
+						done: "executeAjaxQueryComplete"
 					}
-				}
+				},
+
+				executeAjaxQuery1: function () {
+					this.execute(this.queries.testQuery1).resolve();
+				},
+
+				executeAjaxQueryComplete: sinon.spy()
 			});
 
 			_testViewModel = new TestViewModel();
+
+			mockAjaxCall = sinon.stub($, "ajax", function () { return $.Deferred(); });
+		});
+
+		afterEach(function () {
+			mockAjaxCall.restore();
 		});
 
 		it("should have default properties defined", function () {
@@ -61,6 +78,26 @@ define([
 
 		it("should configure queries", function () {
 			expect(_testViewModel._queries).to.exist;
+		});
+
+		describe("Queries", function () {
+
+			it("should be able to execute a predefined query", function () {
+				_testViewModel.executeAjaxQuery1();
+				expect(_testViewModel.executeAjaxQueryComplete.called).to.be.true;
+			});
+
+			it("should execute predefined queries with the correct options", function () {
+				_testViewModel.executeAjaxQuery1();
+				expect(mockAjaxCall.lastCall.args[0].type).to.equal("get");
+				expect(mockAjaxCall.lastCall.args[0].url).to.equal("http://example.com");
+			});
+
+			it("should execute predefined queries with the proper context", function () {
+				_testViewModel.executeAjaxQuery1();
+				expect(_testViewModel.executeAjaxQueryComplete.lastCall.thisValue).to.equal(_testViewModel);
+			});
+
 		});
 	});
 

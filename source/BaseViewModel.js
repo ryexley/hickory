@@ -169,6 +169,10 @@ define([
 
       data: function (target, context) {
         return target;
+      },
+
+      done: function (target, context) {
+        return context[target];
       }
     },
 
@@ -192,22 +196,35 @@ define([
         data: params.data || {},
         contentType: params.contentType || "application/json; charset=utf-8",
         context: params.context || self
-      })
-      .done(function (data) {
-        if (params.done) {
-          params.done.call(params.context || self, data);
-        }
-      })
-      .fail(function (data) {
-        if (params.fail) {
-          params.fail.call(params.context || self, data);
-        }
-      })
-      .always(function (data) {
-        if (params.always) {
-          params.always.call(params.context || self, data);
-        }
       });
+
+      if (params.done) {
+        request.done(params.done.bind(params.context || self));
+      }
+
+      if (params.fail) {
+        request.fail(params.fail);
+      }
+
+      if (params.always) {
+        request.always(params.always);
+      }
+
+      // .done(function (data) {
+      //   if (params.done) {
+      //     params.done.call(params.context || self, data);
+      //   }
+      // })
+      // .fail(function (data) {
+      //   if (params.fail) {
+      //     params.fail.call(params.context || self, data);
+      //   }
+      // })
+      // .always(function (data) {
+      //   if (params.always) {
+      //     params.always.call(params.context || self, data);
+      //   }
+      // });
 
       return request;
     }
