@@ -8,7 +8,7 @@ requirejs.config({
 		knockoutAmd: "components/knockout-amd-helpers/build/knockout-amd-helpers",
 		postal: "components/postaljs/lib/postal",
 		text: "components/requirejs-text/text",
-		chai: "components/chai/chai",
+		chai: "../node_modules/chai/chai",
 		sinon: "../node_modules/sinon/pkg/sinon-1.7.2",
 		spec: "../spec"
 	},

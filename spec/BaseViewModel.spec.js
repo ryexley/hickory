@@ -54,33 +54,57 @@ define([
 			mockAjaxCall.restore();
 		});
 
-		it("should have default properties defined", function () {
-			expect(_testViewModel.id).to.exist;
-			expect(_testViewModel.name).to.exist;
-			expect(_testViewModel.description).to.exist;
-			expect(_testViewModel.notes).to.exist;
+		describe("instances", function () {
+
+			it("should extend messenger mixin", function () {
+				expect(_testViewModel.messaging).to.exist;
+				expect(_testViewModel.publish).to.exist;
+				expect(_testViewModel.subscribe).to.exist;
+			});
+
+			it("should extend events mixin", function () {
+				expect(_testViewModel.on).to.exist;
+				expect(_testViewModel.off).to.exist;
+				expect(_testViewModel.once).to.exist;
+				expect(_testViewModel.trigger).to.exist;
+				expect(_testViewModel.stopListening).to.exist;
+			});
+
 		});
 
-		it("default properties should be knockout observable", function () {
-			expect(ko.isObservable(_testViewModel.id)).to.be.true;
-			expect(ko.isObservable(_testViewModel.name)).to.be.true;
-			expect(ko.isObservable(_testViewModel.description)).to.be.true;
-			expect(ko.isObservable(_testViewModel.notes)).to.be.true;
+		describe("_setup", function () {
+
+			it("should define default properties", function () {
+				expect(_testViewModel.id).to.exist;
+				expect(_testViewModel.name).to.exist;
+				expect(_testViewModel.description).to.exist;
+				expect(_testViewModel.notes).to.exist;
+			});
+
+			it("should setup default properties as knockout observable", function () {
+				expect(ko.isObservable(_testViewModel.id)).to.be.true;
+				expect(ko.isObservable(_testViewModel.name)).to.be.true;
+				expect(ko.isObservable(_testViewModel.description)).to.be.true;
+				expect(ko.isObservable(_testViewModel.notes)).to.be.true;
+			});
+
+			it("should configure commands", function () {
+				expect(_testViewModel._commands).to.exist;
+			});
+
+			it("should configure queries", function () {
+				expect(_testViewModel._queries).to.exist;
+			});
+
 		});
 
-		it("should configure messaging", function () {
-			expect(_testViewModel.messaging).to.exist;
+		describe("commands", function () {
+
+
+
 		});
 
-		it("should configure commands", function () {
-			expect(_testViewModel._commands).to.exist;
-		});
-
-		it("should configure queries", function () {
-			expect(_testViewModel._queries).to.exist;
-		});
-
-		describe("Queries", function () {
+		describe("queries", function () {
 
 			it("should be able to execute a predefined query", function () {
 				_testViewModel.executeAjaxQuery1();
