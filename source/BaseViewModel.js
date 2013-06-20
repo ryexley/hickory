@@ -172,6 +172,10 @@ define([
         return target;
       },
 
+      type: function (target, context) {
+        return target;
+      },
+
       data: function (target, context) {
         return target;
       },

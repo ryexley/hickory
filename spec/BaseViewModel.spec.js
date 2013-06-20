@@ -27,7 +27,9 @@ define([
 				commands: {
 					testCommand1: {
 						url: "http://example.com",
-						data: {}
+						type: "post",
+						data: { foo: "test-1", bar: "test-2" },
+						done: "testCommand1Done"
 					}
 				},
 
@@ -41,6 +43,12 @@ define([
 				executeAjaxQuery1: function () {
 					this.execute(this.queries.testQuery1).resolve();
 				},
+
+				executeTestCommand1: function () {
+					this.execute(this.commands.testCommand1).resolve();
+				},
+
+				testCommand1Done: sinon.spy(),
 
 				executeAjaxQueryComplete: sinon.spy()
 			});
@@ -100,7 +108,10 @@ define([
 
 		describe("commands", function () {
 
-
+			it("should execute a predefined command", function () {
+				_testViewModel.executeTestCommand1();
+				expect(_testViewModel.testCommand1Done.called).to.be.true;
+			});
 
 		});
 
