@@ -1,3 +1,8 @@
+// TODO: New functionality to add:
+// * Add a method for automatically loading data into collections, via: http://jsfiddle.net/digitalbush/DH5UT/
+// * Add functionality similar to Backbone's "set" and "parse" functions
+// * Add functionality to support persistence to localStorage and/or sessionStorage
+
 // dependencies
 define([
   "jquery", /* http://jquery.com/ */
