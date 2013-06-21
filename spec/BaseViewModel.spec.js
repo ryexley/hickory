@@ -26,10 +26,15 @@ define([
 
 				commands: {
 					testCommand1: {
-						url: "http://example.com",
+						url: "http://example.com/command-1",
 						type: "post",
-						data: { foo: "test-1", bar: "test-2" },
+						data: { foo: "command-1-foo", bar: "command-1-bar" },
 						done: "testCommand1Done"
+					},
+					testCommand2: {
+						url: "http://example.com/test-2",
+						type: "put",
+						data: { foo: "command-2-foo", bar: "command-2-bar" }
 					}
 				},
 
@@ -48,7 +53,14 @@ define([
 					this.execute(this.commands.testCommand1).resolve();
 				},
 
+				executeTestCommand2: function () {
+					this.execute(this.commands.testCommand2)
+						.done(this.testCommand2Done);
+				},
+
 				testCommand1Done: sinon.spy(),
+
+				testCommand2Done: sinon.spy(),
 
 				executeAjaxQueryComplete: sinon.spy()
 			});
@@ -111,6 +123,19 @@ define([
 			it("should execute a predefined command", function () {
 				_testViewModel.executeTestCommand1();
 				expect(_testViewModel.testCommand1Done.called).to.be.true;
+			});
+
+			it("should execute predefined commands with the correct options", function () {
+				_testViewModel.executeTestCommand1();
+				expect(mockAjaxCall.lastCall.args[0].type).to.equal("post");
+				expect(mockAjaxCall.lastCall.args[0].url).to.equal("http://example.com/command-1");
+				expect(mockAjaxCall.lastCall.args[0].data.foo).to.equal("command-1-foo");
+				expect(mockAjaxCall.lastCall.args[0].data.bar).to.equal("command-1-bar");
+			});
+
+			it("should allow chained callbacks on execution", function () {
+				_testViewModel.executeTestCommand2();
+				expect(_testViewModel.testCommand2Done.called).to.be.true;
 			});
 
 		});

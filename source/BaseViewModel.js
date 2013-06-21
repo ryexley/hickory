@@ -5,14 +5,14 @@
 
 // dependencies
 define([
-  "jquery", /* http://jquery.com/ */
-  "underscore", /* http://underscorejs.org/ */
-  "knockout", /* http://knockoutjs.com/ */
-  "knockoutAmd", /* https://github.com/rniemeyer/knockout-amd-helpers */
-  "postal", /* https://github.com/postaljs/postal.js */
-  "messenger", /* ./messenger.js */
-  "events", /* ./events.js */
-  "extend" /* ./extend.js */
+  "jquery",       /* http://jquery.com/ */
+  "underscore",   /* http://underscorejs.org/ */
+  "knockout",     /* http://knockoutjs.com/ */
+  "knockoutAmd",  /* https://github.com/rniemeyer/knockout-amd-helpers */
+  "postal",       /* https://github.com/postaljs/postal.js */
+  "messenger",    /* ./messenger.js */
+  "events",       /* ./events.js */
+  "extend"        /* ./extend.js */
 ], function ($, _, ko, koAmd, postal, messenger, events, extend) {
 
   "use strict";
@@ -167,8 +167,8 @@ define([
     },
 
     // TODO: revisit this...not sure if I'm doing this right or not
+    /* jshint unused:false */
     _executeOptions: {
-      /* jshint unused:false */
       url: function (target, context) {
         return target;
       },
@@ -184,8 +184,8 @@ define([
       done: function (target, context) {
         return context[target];
       }
-      /* jshint unused:true */
     },
+    /* jshint unused:true */
 
     bind: function (bindings, el) {
       ko.applyBindings(bindings, el);
@@ -199,8 +199,6 @@ define([
       var self = this;
       params = this[params.type][params.name];
 
-      // TODO: pull the callback functions out of this...they should be defined in child classes as follows:
-      // this.execute(params).done(...).fail(...).always(...);
       var request = $.ajax({
         url: params.url,
         type: params.type || "get",
@@ -220,22 +218,6 @@ define([
       if (params.always) {
         request.always(params.always);
       }
-
-      // .done(function (data) {
-      //   if (params.done) {
-      //     params.done.call(params.context || self, data);
-      //   }
-      // })
-      // .fail(function (data) {
-      //   if (params.fail) {
-      //     params.fail.call(params.context || self, data);
-      //   }
-      // })
-      // .always(function (data) {
-      //   if (params.always) {
-      //     params.always.call(params.context || self, data);
-      //   }
-      // });
 
       return request;
     }
