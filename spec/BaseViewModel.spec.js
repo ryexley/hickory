@@ -55,7 +55,8 @@ define([
 
 				executeTestCommand2: function () {
 					this.execute(this.commands.testCommand2)
-						.done(this.testCommand2Done);
+						.done(this.testCommand2Done)
+						.resolve();
 				},
 
 				testCommand1Done: sinon.spy(),
