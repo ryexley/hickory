@@ -168,6 +168,7 @@ define([
 
     // TODO: revisit this...not sure if I'm doing this right or not
     _executeOptions: {
+      /* jshint unused:false */
       url: function (target, context) {
         return target;
       },
@@ -183,6 +184,7 @@ define([
       done: function (target, context) {
         return context[target];
       }
+      /* jshint unused:true */
     },
 
     bind: function (bindings, el) {

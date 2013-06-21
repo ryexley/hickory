@@ -90,7 +90,7 @@ define([
 					}
 
 					_.each(_message, function (accessor, m) {
-						var meta = m.split(' ');
+						var meta = m.split(" ");
 						var channel = meta[0];
 						var topic = meta[1];
 						var listener = function () {
@@ -128,7 +128,7 @@ define([
 				_.each(this.subscriptions, function (subscription, handler) {
 					subscription = _.isArray(subscription) ? subscription : [subscription];
 					_.each(subscription, function (s) {
-						var meta = s.split(' ');
+						var meta = s.split(" ");
 						var channel = meta[1] ? meta[0] : this.channelName;
 						var topic = meta[1] || meta[0];
 

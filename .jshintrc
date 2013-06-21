@@ -1,0 +1,24 @@
+{
+	"boss": true,
+	"curly": true,
+	"eqeqeq": true,
+	"eqnull": true,
+	"expr": true,
+	"immed": true,
+	"noarg": true,
+	"onevar": false,
+	"quotmark": true,
+	"smarttabs": true,
+	"trailing": true,
+	"undef": true,
+	"unused": true,
+	"globals": {
+		"window": true,
+		"$": true,
+		"_": true,
+		"requirejs": true,
+		"require": true,
+		"define": true,
+		"ko": true
+	}
+}
