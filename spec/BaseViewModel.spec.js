@@ -25,45 +25,45 @@ define([
 				},
 
 				commands: {
-					testCommand1: {
+					command1: {
 						url: "http://example.com/command-1",
 						type: "post",
 						data: { foo: "command-1-foo", bar: "command-1-bar" },
-						done: "testCommand1Done"
+						done: "command1Done"
 					},
-					testCommand2: {
-						url: "http://example.com/test-2",
+					command2: {
+						url: "http://example.com/command-2",
 						type: "put",
 						data: { foo: "command-2-foo", bar: "command-2-bar" }
 					}
 				},
 
 				queries: {
-					testQuery1: {
-						url: "http://example.com",
-						done: "executeAjaxQueryComplete"
+					query1: {
+						url: "http://example.com/query-1",
+						done: "query1Done"
 					}
 				},
 
-				executeAjaxQuery1: function () {
-					this.execute(this.queries.testQuery1).resolve();
+				executeQuery1: function () {
+					this.execute(this.queries.query1).resolve();
 				},
 
-				executeTestCommand1: function () {
-					this.execute(this.commands.testCommand1).resolve();
+				executeCommand1: function () {
+					this.execute(this.commands.command1).resolve();
 				},
 
-				executeTestCommand2: function () {
-					this.execute(this.commands.testCommand2)
-						.done(this.testCommand2Done)
+				executeCommand2: function () {
+					this.execute(this.commands.command2)
+						.done(this.command2Done)
 						.resolve();
 				},
 
-				testCommand1Done: sinon.spy(),
+				command1Done: sinon.spy(),
 
-				testCommand2Done: sinon.spy(),
+				command2Done: sinon.spy(),
 
-				executeAjaxQueryComplete: sinon.spy()
+				query1Done: sinon.spy()
 			});
 
 			_testViewModel = new TestViewModel();
@@ -122,12 +122,12 @@ define([
 		describe("commands", function () {
 
 			it("should execute a predefined command", function () {
-				_testViewModel.executeTestCommand1();
-				expect(_testViewModel.testCommand1Done.called).to.be.true;
+				_testViewModel.executeCommand1();
+				expect(_testViewModel.command1Done.called).to.be.true;
 			});
 
 			it("should execute predefined commands with the correct options", function () {
-				_testViewModel.executeTestCommand1();
+				_testViewModel.executeCommand1();
 				expect(mockAjaxCall.lastCall.args[0].type).to.equal("post");
 				expect(mockAjaxCall.lastCall.args[0].url).to.equal("http://example.com/command-1");
 				expect(mockAjaxCall.lastCall.args[0].data.foo).to.equal("command-1-foo");
@@ -135,8 +135,8 @@ define([
 			});
 
 			it("should allow chained callbacks on execution", function () {
-				_testViewModel.executeTestCommand2();
-				expect(_testViewModel.testCommand2Done.called).to.be.true;
+				_testViewModel.executeCommand2();
+				expect(_testViewModel.command2Done.called).to.be.true;
 			});
 
 		});
@@ -144,19 +144,19 @@ define([
 		describe("queries", function () {
 
 			it("should be able to execute a predefined query", function () {
-				_testViewModel.executeAjaxQuery1();
-				expect(_testViewModel.executeAjaxQueryComplete.called).to.be.true;
+				_testViewModel.executeQuery1();
+				expect(_testViewModel.query1Done.called).to.be.true;
 			});
 
 			it("should execute predefined queries with the correct options", function () {
-				_testViewModel.executeAjaxQuery1();
+				_testViewModel.executeQuery1();
 				expect(mockAjaxCall.lastCall.args[0].type).to.equal("get");
-				expect(mockAjaxCall.lastCall.args[0].url).to.equal("http://example.com");
+				expect(mockAjaxCall.lastCall.args[0].url).to.equal("http://example.com/query-1");
 			});
 
 			it("should execute predefined queries with the proper context", function () {
-				_testViewModel.executeAjaxQuery1();
-				expect(_testViewModel.executeAjaxQueryComplete.lastCall.thisValue).to.equal(_testViewModel);
+				_testViewModel.executeQuery1();
+				expect(_testViewModel.query1Done.lastCall.thisValue).to.equal(_testViewModel);
 			});
 
 		});
