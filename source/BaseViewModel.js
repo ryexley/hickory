@@ -183,6 +183,10 @@ define([
 
 			done: function (target, context) {
 				return context[target];
+			},
+
+			fail: function (target, context) {
+				return context[target];
 			}
 		},
 		/* jshint unused:true */

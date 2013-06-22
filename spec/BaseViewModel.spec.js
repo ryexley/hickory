@@ -1,3 +1,5 @@
+// TODO: things to test: https://gist.github.com/rniemeyer/c13fd3fb67215125e43f
+
 define([
 	"jquery",
 	"knockout",
@@ -41,12 +43,22 @@ define([
 				queries: {
 					query1: {
 						url: "http://example.com/query-1",
-						done: "query1Done"
+						done: "query1Done",
+						fail: "query1Fail"
+					},
+					query2: {
+						url: "http://example.com/query-2"
 					}
 				},
 
 				executeQuery1: function () {
 					this.execute(this.queries.query1).resolve();
+				},
+
+				executeQuery2: function () {
+					this.execute(this.queries.query2)
+						.done(this.query2Done)
+						.resolve();
 				},
 
 				executeCommand1: function () {
@@ -63,7 +75,11 @@ define([
 
 				command2Done: sinon.spy(),
 
-				query1Done: sinon.spy()
+				query1Done: sinon.spy(),
+
+				query1Fail: sinon.spy(),
+
+				query2Done: sinon.spy()
 			});
 
 			_testViewModel = new TestViewModel();
@@ -157,6 +173,16 @@ define([
 			it("should execute predefined queries with the proper context", function () {
 				_testViewModel.executeQuery1();
 				expect(_testViewModel.query1Done.lastCall.thisValue).to.equal(_testViewModel);
+			});
+
+			it("should execute predefined fail callbacks when execute fails", function () {
+				_testViewModel.execute(_testViewModel.queries.query1).reject();
+				expect(_testViewModel.query1Fail.called).to.be.true;
+			});
+
+			it("should execute chained callbacks on execution", function () {
+				_testViewModel.executeQuery2();
+				expect(_testViewModel.query2Done.called).to.be.true;
 			});
 
 		});
