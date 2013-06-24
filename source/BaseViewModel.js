@@ -127,6 +127,8 @@ define([
 			_.each(self.defaults, function (value, prop) {
 				if (_.isFunction(value)) {
 					self[prop] = ko.computed(self.defaults[prop], self);
+				} else if (_.isFunction(self[value])) {
+					self[prop] = ko.computed(self[value], self);
 				} else {
 					self[prop] = _.isArray(value) ?
 						// Use an existing observable, or o=copy the options or default array

@@ -23,7 +23,9 @@ define([
 					id: "",
 					name: "",
 					description: "",
-					notes: []
+					notes: [],
+					internalName: "computeInternalName",
+					twoPlusTwoEqualsFour: function () { return 2 + 2; }
 				},
 
 				commands: {
@@ -49,6 +51,10 @@ define([
 					query2: {
 						url: "http://example.com/query-2"
 					}
+				},
+
+				computeInternalName: function () {
+					return this.id() + "-" + this.name();
 				},
 
 				executeQuery1: function () {
@@ -109,7 +115,7 @@ define([
 
 		});
 
-		describe("_setup", function () {
+		describe("defaults", function () {
 
 			it("should define default properties", function () {
 				expect(_testViewModel.id).to.exist;
@@ -125,17 +131,38 @@ define([
 				expect(ko.isObservable(_testViewModel.notes)).to.be.true;
 			});
 
-			it("should configure commands", function () {
-				expect(_testViewModel._commands).to.exist;
+			it("should setup default properties defined as arrays to function as expected", function () {
+				expect(_testViewModel.notes.push).to.exist;
+				_testViewModel.notes.push("Test note");
+				expect(_testViewModel.notes.slice(-1)[0]).to.equal("Test note");
 			});
 
-			it("should configure queries", function () {
-				expect(_testViewModel._queries).to.exist;
+			it("should setup default properties defined as anonymous functions to be knockout computed observables", function () {
+				expect(ko.isComputed(_testViewModel.twoPlusTwoEqualsFour)).to.be.true;
+			});
+
+			it("should setup default values that equal function names as knockout computed observables", function () {
+				expect(ko.isComputed(_testViewModel.internalName)).to.be.true;
+			});
+
+			it("should setup anonymous functions defined as knockout computed properties that function as expected", function () {
+				var prop = _testViewModel.twoPlusTwoEqualsFour();
+				expect(prop).to.equal(4);
+			});
+
+			it("should setup predefined functions defined as knockout computed properties that function as expected", function () {
+				var manuallyComputed = _testViewModel.id() + "-" + _testViewModel.name();
+				var computedProperty = _testViewModel.internalName();
+				expect(computedProperty).to.equal(manuallyComputed);
 			});
 
 		});
 
 		describe("commands", function () {
+
+			it("should configure commands", function () {
+				expect(_testViewModel._commands).to.exist;
+			});
 
 			it("should execute a predefined command", function () {
 				_testViewModel.executeCommand1();
@@ -158,6 +185,10 @@ define([
 		});
 
 		describe("queries", function () {
+
+			it("should configure queries", function () {
+				expect(_testViewModel._queries).to.exist;
+			});
 
 			it("should be able to execute a predefined query", function () {
 				_testViewModel.executeQuery1();
