@@ -164,8 +164,25 @@ define([
 				self.queries[queryName] = { type: "_queries", name: queryName };
 			});
 
+			// self._requests = {};
+			// _.each(self.queries, function (queryData, queryName) {
+			// 	self._setupInternalRequest(self.queries, "query", queryName, queryData);
+			// });
+
 			this.configureMessaging();
 			ko.amdTemplateEngine.defaultPath = this.templatePath;
+		},
+
+		_setupInternalRequest: function (source, requestType, requestName, data) {
+			var self = this;
+			var request = {};
+			_.each(data, function (value, key) {
+				request[key] = self._executeOptions[key](value, self);
+			});
+
+			var requestKey = requestType + "-" + requestName;
+			self._requests[requestKey] = { type: requestType, name: requestName };
+			source[requestName] = requestKey;
 		},
 
 		// TODO: revisit this...not sure if I'm doing this right or not
