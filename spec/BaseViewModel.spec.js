@@ -14,6 +14,8 @@ define([
 
 	describe("BaseViewModel", function () {
 		var TestViewModel;
+		var Note;
+		var Team;
 		var _testViewModel;
 		var mockAjaxCall;
 
@@ -24,6 +26,7 @@ define([
 					name: "",
 					description: "",
 					notes: [],
+					teams: [],
 					internalName: "computeInternalName",
 					twoPlusTwoEqualsFour: function () { return 2 + 2; }
 				},
@@ -86,6 +89,29 @@ define([
 				query1Fail: sinon.spy(),
 
 				query2Done: sinon.spy()
+			});
+
+			Note = function (text) {
+				this.date = new Date();
+				this.note = text;
+			};
+
+			Team = BaseViewModel.extend({
+				defaults: {
+					team: "",
+					mascot: ""
+				},
+
+				initialize: function (data) {
+					this.loadData(data);
+				},
+
+				parse: function (raw) {
+					return {
+						team: raw.Team,
+						mascot: raw.Mascot
+					};
+				}
 			});
 
 			_testViewModel = new TestViewModel();
@@ -256,6 +282,39 @@ define([
 				expect(_testViewModel.id()).to.equal(4);
 				expect(_testViewModel.name()).to.equal("Test ViewModel");
 				expect(_testViewModel.description()).to.equal("This is a test ViewModel that extends BaseViewModel for testing");
+			});
+
+			it("should support pushAll collection creation when array data is passed to an observableArray property", function () {
+				var notesData = [
+					"Note 1",
+					"Note 2",
+					"Note 3",
+					"Note 4"
+				];
+
+				_testViewModel.notes.pushAll(notesData, Note);
+
+				expect(_testViewModel.notes().length).to.equal(4);
+				_.each(_testViewModel.notes(), function (note) {
+					expect(note).to.be.an.instanceOf(Note);
+					expect(note.date).to.be.an.instanceOf(Date);
+					expect(note.note.length > 0).to.be.true;
+				});
+
+				var teamsData = [
+					{ Team: "Tennessee", Mascot: "Volunteers" },
+					{ Team: "Oregon State", Mascot: "Beavers" },
+					{ Team: "Oregon", Mascot: "Ducks" },
+					{ Team: "Ohio State", Mascot: "Buckeyes" }
+				];
+
+				_testViewModel.teams.pushAll(teamsData, Team);
+				expect(_testViewModel.teams().length).to.equal(4);
+				_.each(_testViewModel.teams(), function (team) {
+					expect(team).to.be.an.instanceOf(Team);
+					expect(team.team().length > 0).to.be.true;
+					expect(team.mascot().length > 0).to.be.true;
+				});
 			});
 
 		});

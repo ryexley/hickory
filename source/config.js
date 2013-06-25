@@ -10,6 +10,7 @@ requirejs.config({
 		text: "components/requirejs-text/text",
 		chai: "../node_modules/chai/chai",
 		sinon: "../node_modules/sinon/pkg/sinon-1.7.2",
+		blanket: "../node_modules/blanket/src/blanket",
 		spec: "../spec"
 	},
 	shim: {

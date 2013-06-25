@@ -171,6 +171,22 @@ define([
 
 			this.configureMessaging();
 			ko.amdTemplateEngine.defaultPath = this.templatePath;
+
+			// extends Knockout.observableArray for easy collection creation
+			// pass it an array of data, and a type constructor function and
+			// it will set the observableArray property to an array of objects
+			// of the given type initialized with the data in each element of
+			// the given array of data
+			ko.observableArray.fn.pushAll = function (items, ctor) {
+				if (ctor) {
+					items = items.map(function (item) {
+						return new ctor(item);
+					});
+				}
+
+				var args = [this.peek().length, 0].concat(items);
+				this.splice.apply(this, args);
+			};
 		},
 
 		_setupInternalRequest: function (source, requestType, requestName, data) {
