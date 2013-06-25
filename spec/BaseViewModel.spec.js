@@ -217,6 +217,48 @@ define([
 			});
 
 		});
+
+		describe("data", function () {
+
+			it("should allow for loading data from an object", function () {
+				expect(_testViewModel.loadData).to.exist;
+			});
+
+			it("should load data from a given object", function () {
+				_testViewModel.loadData({
+					id: 4,
+					name: "Test ViewModel",
+					description: "This is a test ViewModel that extends BaseViewModel for testing"
+				});
+
+				expect(_testViewModel.id()).to.equal(4);
+				expect(_testViewModel.name()).to.equal("Test ViewModel");
+				expect(_testViewModel.description()).to.equal("This is a test ViewModel that extends BaseViewModel for testing");
+			});
+
+			it("should support support parsing data prior to load", function () {
+				_testViewModel.parse = function (raw) {
+					var parsed = {
+						id: raw.Id,
+						name: raw.Name,
+						description: raw.Description
+					};
+
+					return parsed;
+				};
+
+				_testViewModel.loadData({
+					Id: 4,
+					Name: "Test ViewModel",
+					Description: "This is a test ViewModel that extends BaseViewModel for testing"
+				});
+
+				expect(_testViewModel.id()).to.equal(4);
+				expect(_testViewModel.name()).to.equal("Test ViewModel");
+				expect(_testViewModel.description()).to.equal("This is a test ViewModel that extends BaseViewModel for testing");
+			});
+
+		});
 	});
 
 });

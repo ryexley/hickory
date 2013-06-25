@@ -243,6 +243,20 @@ define([
 			}
 
 			return request;
+		},
+
+		loadData: function (data) {
+			var self = this;
+
+			if (this.parse) {
+				data = this.parse(data);
+			}
+
+			_.each(data, function (value, key) {
+				if (self[key]) {
+					self[key](value);
+				}
+			});
 		}
 
 	});
