@@ -164,13 +164,12 @@ define([
 				self.queries[queryName] = { type: "_queries", name: queryName };
 			});
 
-			// self._requests = {};
-			// _.each(self.queries, function (queryData, queryName) {
-			// 	self._setupInternalRequest(self.queries, "query", queryName, queryData);
-			// });
-
 			this.configureMessaging();
-			ko.amdTemplateEngine.defaultPath = this.templatePath;
+
+			// ko.amdTemplateEngine.defaultPath = this.templatePath;
+			if (this.templatePath !== "templates" && ko.amdTemplateEngine.defaultPath === "templates") {
+				ko.amdTemplateEngine.defaultPath = this.templatePath;
+			}
 
 			// extends Knockout.observableArray for easy collection creation
 			// pass it an array of data, and a type constructor function and
@@ -187,18 +186,6 @@ define([
 				var args = [this.peek().length, 0].concat(items);
 				this.splice.apply(this, args);
 			};
-		},
-
-		_setupInternalRequest: function (source, requestType, requestName, data) {
-			var self = this;
-			var request = {};
-			_.each(data, function (value, key) {
-				request[key] = self._executeOptions[key](value, self);
-			});
-
-			var requestKey = requestType + "-" + requestName;
-			self._requests[requestKey] = { type: requestType, name: requestName };
-			source[requestName] = requestKey;
 		},
 
 		// TODO: revisit this...not sure if I'm doing this right or not
@@ -273,6 +260,21 @@ define([
 					self[key](value);
 				}
 			});
+		},
+
+		buildCollection : function (items, ctor) {
+			var collection = [];
+
+			if (ctor) {
+				items = items.map(function (item) {
+					return new ctor(item);
+				});
+			}
+
+			var args = [collection.length, 0].concat(items);
+			collection.splice.apply(collection, args);
+
+			return collection;
 		}
 
 	});
