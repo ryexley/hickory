@@ -17,6 +17,22 @@ define([
 
 	"use strict";
 
+	// extends Knockout.observableArray for easy collection creation
+	// pass it an array of data, and a type constructor function and
+	// it will set the observableArray property to an array of objects
+	// of the given type initialized with the data in each element of
+	// the given array of data
+	ko.observableArray.fn.pushAll = function (items, ctor) {
+		if (ctor) {
+			items = items.map(function (item) {
+				return new ctor(item);
+			});
+		}
+
+		var args = [this.peek().length, 0].concat(items);
+		this.splice.apply(this, args);
+	};
+
 	/**
 		Allow other ViewModels to extend a BaseViewModel
 		Parameters set in the `default` option get setup as Knockout observables
@@ -143,6 +159,7 @@ define([
 			});
 
 			self._commands = {};
+			var commandRefs = [];
 			_.each(self.commands, function (commandData, commandName) {
 				var command = {};
 				_.each(commandData, function (value, key) {
@@ -150,10 +167,18 @@ define([
 				});
 
 				self._commands[commandName] = command;
-				self.commands[commandName] = { type: "_commands", name: commandName };
+				commandRefs.push({
+					name: commandName,
+					value: { type: "_commands", name: commandName }
+				});
+			});
+
+			_.each(commandRefs, function (ref) {
+				self.commands[ref.name] = ref.value;
 			});
 
 			self._queries = {};
+			var queryRefs = [];
 			_.each(self.queries, function (queryData, queryName) {
 				var query = {};
 				_.each(queryData, function (value, key) {
@@ -161,7 +186,14 @@ define([
 				});
 
 				self._queries[queryName] = query;
-				self.queries[queryName] = { type: "_queries", name: queryName };
+				queryRefs.push({
+					name: queryName,
+					value: { type: "_queries", name: queryName }
+				});
+			});
+
+			_.each(queryRef, function (ref) {
+				self.queries[ref.name] = ref.value;
 			});
 
 			this.configureMessaging();
@@ -170,22 +202,6 @@ define([
 			if (this.templatePath !== "templates" && ko.amdTemplateEngine.defaultPath === "templates") {
 				ko.amdTemplateEngine.defaultPath = this.templatePath;
 			}
-
-			// extends Knockout.observableArray for easy collection creation
-			// pass it an array of data, and a type constructor function and
-			// it will set the observableArray property to an array of objects
-			// of the given type initialized with the data in each element of
-			// the given array of data
-			ko.observableArray.fn.pushAll = function (items, ctor) {
-				if (ctor) {
-					items = items.map(function (item) {
-						return new ctor(item);
-					});
-				}
-
-				var args = [this.peek().length, 0].concat(items);
-				this.splice.apply(this, args);
-			};
 		},
 
 		// TODO: revisit this...not sure if I'm doing this right or not
@@ -219,6 +235,10 @@ define([
 
 		serialize: function () {
 			return ko.toJSON(this);
+		},
+
+		raw: function () {
+			return ko.toJS(this);
 		},
 
 		execute: function (params) {
