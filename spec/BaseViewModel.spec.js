@@ -76,6 +76,11 @@ define([
 							bar: "query-5-bar"
 						},
 						done: "query5Done"
+					},
+					query6: {
+						url: "http://example.com/query-6",
+						data: "getQuery6Data",
+						done: "query6Done"
 					}
 				},
 
@@ -87,6 +92,14 @@ define([
 					return {
 						foo: "query-3-foo",
 						bar: "query-3-bar"
+					};
+				},
+
+				getQuery6Data: function () {
+					return {
+						Id: this.id(),
+						Name: this.name(),
+						Notes: this.notes()
 					};
 				},
 
@@ -110,6 +123,10 @@ define([
 
 				executeQuery5: function () {
 					this.execute(this.queries.query5).resolve();
+				},
+
+				executeQuery6: function () {
+					this.execute(this.queries.query6).resolve();
 				},
 
 				executeCommand1: function () {
@@ -136,7 +153,9 @@ define([
 
 				query4Done: sinon.spy(),
 
-				query5Done: sinon.spy()
+				query5Done: sinon.spy(),
+
+				query6Done: sinon.spy()
 			});
 
 			Note = function (text) {
@@ -309,6 +328,19 @@ define([
 				var callData = mockAjaxCall.lastCall.args[0].data;
 				expect(callData.foo).to.equal("query-4-foo");
 				expect(callData.bar).to.equal("query-4-bar");
+			});
+
+			it("should accept data parameters that reference and resolve observable properties on the object", function () {
+				_testViewModel.id(7);
+				_testViewModel.name("Matty Mullins");
+				_testViewModel.notes(["foo", "bar"]);
+				_testViewModel.executeQuery6();
+				var callData = mockAjaxCall.lastCall.args[0].data;
+				expect(callData.Id).to.equal(7);
+				expect(callData.Name).to.equal("Matty Mullins");
+				expect(callData.Notes).to.be.an("Array");
+				expect(callData.Notes[0]).to.equal("foo");
+				expect(callData.Notes[1]).to.equal("bar");
 			});
 
 		});

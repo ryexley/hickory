@@ -240,7 +240,7 @@ define([
 			params = this[params.refMap.type][params.refMap.name];
 
 			if (_.isFunction(params.data)) {
-				data = params.data();
+				data = params.data.call(params.context || self);
 			} else {
 				data = params.data;
 			}
