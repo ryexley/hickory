@@ -159,41 +159,29 @@ define([
 			});
 
 			self._commands = {};
-			var commandRefs = [];
 			_.each(self.commands, function (commandData, commandName) {
 				var command = {};
 				_.each(commandData, function (value, key) {
-					command[key] = self._executeOptions[key](value, self);
+					if (key !== "refMap") {
+						command[key] = self._executeOptions[key](value, self);
+					}
 				});
 
 				self._commands[commandName] = command;
-				commandRefs.push({
-					name: commandName,
-					value: { type: "_commands", name: commandName }
-				});
-			});
-
-			_.each(commandRefs, function (ref) {
-				self.commands[ref.name] = ref.value;
+				self.commands[commandName]["refMap"] = { type: "_commands", name: commandName };
 			});
 
 			self._queries = {};
-			var queryRefs = [];
 			_.each(self.queries, function (queryData, queryName) {
 				var query = {};
 				_.each(queryData, function (value, key) {
-					query[key] = self._executeOptions[key](value, self);
+					if (key !== "refMap") {
+						query[key] = self._executeOptions[key](value, self);
+					}
 				});
 
 				self._queries[queryName] = query;
-				queryRefs.push({
-					name: queryName,
-					value: { type: "_queries", name: queryName }
-				});
-			});
-
-			_.each(queryRef, function (ref) {
-				self.queries[ref.name] = ref.value;
+				self.queries[queryName]["refMap"] = { type: "_queries", name: queryName };
 			});
 
 			this.configureMessaging();
@@ -216,7 +204,12 @@ define([
 			},
 
 			data: function (target, context) {
-				return target;
+				// return target;
+				if (context[target]) {
+					return context[target];
+				} else {
+					return target;
+				}
 			},
 
 			done: function (target, context) {
@@ -243,12 +236,19 @@ define([
 
 		execute: function (params) {
 			var self = this;
-			params = this[params.type][params.name];
+			var data;
+			params = this[params.refMap.type][params.refMap.name];
+
+			if (_.isFunction(params.data)) {
+				data = params.data();
+			} else {
+				data = params.data;
+			}
 
 			var request = $.ajax({
 				url: params.url,
 				type: params.type || "get",
-				data: params.data || {},
+				data: data || {},
 				contentType: params.contentType || "application/json; charset=utf-8",
 				context: params.context || self
 			});
@@ -258,11 +258,11 @@ define([
 			}
 
 			if (params.fail) {
-				request.fail(params.fail);
+				request.fail(params.fail.bind(params.context || self));
 			}
 
 			if (params.always) {
-				request.always(params.always);
+				request.always(params.always.bind(params.context || self));
 			}
 
 			return request;

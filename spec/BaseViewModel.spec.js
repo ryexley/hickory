@@ -53,11 +53,41 @@ define([
 					},
 					query2: {
 						url: "http://example.com/query-2"
+					},
+					query3: {
+						url: "http://example.com/query-3",
+						data: "query3Data",
+						done: "query3Done"
+					},
+					query4: {
+						url: "http://example.com/query-4",
+						data: function () {
+							return {
+								foo: "query-4-foo",
+								bar: "query-4-bar"
+							};
+						},
+						done: "query4Done"
+					},
+					query5: {
+						url: "http://example.com/query-5",
+						data: {
+							foo: "query-5-foo",
+							bar: "query-5-bar"
+						},
+						done: "query5Done"
 					}
 				},
 
 				computeInternalName: function () {
 					return this.id() + "-" + this.name();
+				},
+
+				query3Data: function () {
+					return {
+						foo: "query-3-foo",
+						bar: "query-3-bar"
+					};
 				},
 
 				executeQuery1: function () {
@@ -68,6 +98,18 @@ define([
 					this.execute(this.queries.query2)
 						.done(this.query2Done)
 						.resolve();
+				},
+
+				executeQuery3: function () {
+					this.execute(this.queries.query3).resolve();
+				},
+
+				executeQuery4: function () {
+					this.execute(this.queries.query4).resolve();
+				},
+
+				executeQuery5: function () {
+					this.execute(this.queries.query5).resolve();
 				},
 
 				executeCommand1: function () {
@@ -88,7 +130,13 @@ define([
 
 				query1Fail: sinon.spy(),
 
-				query2Done: sinon.spy()
+				query2Done: sinon.spy(),
+
+				query3Done: sinon.spy(),
+
+				query4Done: sinon.spy(),
+
+				query5Done: sinon.spy()
 			});
 
 			Note = function (text) {
@@ -240,6 +288,27 @@ define([
 			it("should execute chained callbacks on execution", function () {
 				_testViewModel.executeQuery2();
 				expect(_testViewModel.query2Done.called).to.be.true;
+			});
+
+			it("should accept and use static data as a data parameter", function () {
+				_testViewModel.executeQuery5();
+				var callData = mockAjaxCall.lastCall.args[0].data;
+				expect(callData.foo).to.equal("query-5-foo");
+				expect(callData.bar).to.equal("query-5-bar");
+			});
+
+			it("should accept and execute a predefined function as the data parameter", function () {
+				_testViewModel.executeQuery3();
+				var callData = mockAjaxCall.lastCall.args[0].data;
+				expect(callData.foo).to.equal("query-3-foo");
+				expect(callData.bar).to.equal("query-3-bar");
+			});
+
+			it("should accept and execute an anonymous function as a data parameter", function () {
+				_testViewModel.executeQuery4();
+				var callData = mockAjaxCall.lastCall.args[0].data;
+				expect(callData.foo).to.equal("query-4-foo");
+				expect(callData.bar).to.equal("query-4-bar");
 			});
 
 		});
