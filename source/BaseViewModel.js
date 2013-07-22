@@ -226,8 +226,12 @@ define([
 			ko.applyBindings(bindings, el);
 		},
 
-		serialize: function () {
-			return ko.toJSON(this);
+		serialize: function (target) {
+			if (target) {
+				return ko.toJSON(target);
+			} else {
+				return ko.toJSON(this);
+			}
 		},
 
 		raw: function () {

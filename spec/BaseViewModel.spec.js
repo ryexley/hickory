@@ -206,6 +206,37 @@ define([
 				expect(_testViewModel.stopListening).to.exist;
 			});
 
+			it("should return a the current object when serialize is called with no arguments", function () {
+				_testViewModel.notes(["foo", "bar"]);
+				var serialized = _testViewModel.serialize();
+				expect(_.isString(serialized)).to.be.true;
+				var objectified = JSON.parse(serialized);
+				expect(_.isObject(objectified)).to.be.true;
+				expect(objectified.notes.length).to.equal(2);
+			});
+
+			it("should return a serialized version of the given object when serialize is called with an argument", function () {
+				var target = {
+					foo: "target-foo",
+					bar: "target-bar"
+				};
+
+				var serialized = _testViewModel.serialize(target);
+				expect(_.isString(serialized)).to.be.true;
+				var objectified = JSON.parse(serialized);
+				expect(_.isObject(objectified)).to.be.true;
+				expect(objectified.foo).to.equal("target-foo");
+				expect(objectified.bar).to.equal("target-bar");
+			});
+
+			it("should return an unwrapped version of the current object when raw is called", function () {
+				var result = _testViewModel.raw();
+				expect(ko.isObservable(result.id)).to.be.false;
+				expect(ko.isObservable(result.name)).to.be.false;
+				expect(ko.isObservable(result.description)).to.be.false;
+				expect(ko.isObservable(result.notes)).to.be.false;
+			});
+
 		});
 
 		describe("defaults", function () {
