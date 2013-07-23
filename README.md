@@ -254,13 +254,41 @@ this.raw(); // <- returns an unwrapped version of your object
 ```
 
 ### bind
-The `bind` function...
+The `bind` function is a simple helper function for the KnockoutJS `applyBindings` function, that performs data binding an object to the given DOM element on a page, which will activate KnockoutJS bindings within the given DOM element, with the context of the given object. For example, if you wanted to bind an instance of a `Car` object to a DOM element with an id of `car-details`, you would do so like this:
+
+```javascript
+var car = new Car({ vin: 1234567890987654321 });
+car.bind(car, document.getElementById("car-details"));
+```
 
 ### pushAll
-The `pushAll` function...
+The `pushAll` function is an extension of the KnockoutJS `observableArray` object, that takes an array of objects, and an option type constructor. The function iterates over the given array of objects, and if a constructor is passed, it will create a new instance of the constructor type by using the `new` keyword and passing the current item to the constructor, and then adds the resulting item to the target `observableArray`. If no constructor is passed, the current item in the array is added to the target `observableArray` as is.
+
+```javascript
+// lets assume the an array of options for a vehicle is fetched from a server, and
+// that we have an additional viewModel type defined for options, i.e.
+//		var Option = BaseViewModel.extend({ ... });
+// We can populate the options property on our Car object with the array of options
+// returned from the server as a collection of Option objects like this:
+
+this.options.pushAll(optionData, Option);
+```
 
 ### buildCollection
-The `buildCollection` function...
+The `buildCollection` function is very similar to the `pushAll` function described above (the code is nearly identical), but it can be run standalone, as opposed to being executed as a method of the KnockoutJS `observableArray`. This can be useful if/when you need to build a collection of objects from data, say, in a parse method, to create a collection of objects of a given type prior to running the `loadData` function.
+
+```javascript
+// by itself...
+this.buildCollection(optionData, Option);
+
+// in the `parse` function to support `loadData`
+parse: function (raw) {
+	return {
+		// ...
+		options: this.buildCollection(raw.Options, Option)
+	};
+}
+```
 
 ## Putting it all together
 So after all of that, here's is what the entire viewModel definition for a Car object might look like, all put together:
@@ -320,7 +348,10 @@ var Car = BaseViewModel.extend({
 		}
 	},
 
-	initialize: function () {
+	initialize: function (options) {
+		// lets assume that we're given a vin number when an instance is created...
+		this.vin(options.vin);
+		// now that the vin property is set, we have what we need to fetch the details for this vehicle
 		this.getVehicleData();
 		this.trigger("vehicleInitialized", { vin: this.vin() });
 	},
@@ -332,7 +363,8 @@ var Car = BaseViewModel.extend({
 			make: raw.VehicleMake,
 			model: raw.VehicleModel,
 			year: raw.Year,
-			color: raw.Color
+			color: raw.Color,
+			options: this.buildCollection(raw.ModelOptions, Option)
 		};
 
 		return parsed;
@@ -393,6 +425,7 @@ var Car = BaseViewModel.extend({
 });
 ```
 
+----
 
 So there ya go. Simple enough...right?
 
