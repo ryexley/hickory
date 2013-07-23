@@ -5,9 +5,9 @@ Hickory is a BaseViewModel JavaScript module implementation that attempts to str
 * [A clean, simple and consistent means of defining and creating an instance of a module (constructor)](#module-definition-and-creation)
 * [KnockoutJS observable property definitions](#knockoutjs-observable-property-definitions)
 * [Simplified AJAX call/callback definition and execution](#ajax-command-and-query-definition-and-execution)
-* Simplified PostalJS message publication and subscription definition
+* [Simplified PostalJS message publication and subscription definition](#messaging-defining-messages-and-subscriptions)
 
-And provides the following (I think) useful utility/helper functions:
+And provides the following (I think) useful functions:
 
 * `initialize`
 * `loadData`
@@ -54,7 +54,7 @@ defaults: {
 	model: "", // ko.observable()
 	year: "", // ko.observable()
 	color: "", // ko.observable()
-	transimission: "", // ko.observable()
+	transmission: "", // ko.observable()
 	options: [], // ko.observableArray()
 	price: "calculatePrice" // ko.computed(this.calculatePrice, this)
 }
@@ -139,13 +139,128 @@ getMaintenanceLog: function () {
 
 I think the key takeaway from this would be to note that you have options for how you define/attach callback functions to the execution of your commands and queries. You can either define the function on the command/query object itself, or as you might have noticed, the execute function returns the Ajax call object (an instance of [a jquery `Deferred` object](http://api.jquery.com/category/deferred-object/)), to which you can chain callback functions, as you can see in the `getMaintenanceLog` function call example above.
 
-# DRAFT
+## Messaging - defining messages and subscriptions
 
-This document is incomplete...
+One of the final major goals of the BaseViewModel was to simplify and consolidate the definition of messages (and publishing those messages, e.g. `postal.publish()`) and subscriptions (e.g. `postal.subscribe()`) with PostalJS. The BaseViewModel modules is extended with [the Messenger mixin](https://github.com/ryexley/cedar), which accomplishes this goal for us. Here's how you would define messages and subscriptions on an object that extends BaseViewModel:
 
 ```javascript
-// TODO: Finish documentation...
+// it is important to note that you *must* define a channelName on your object
+// in order for messaging and subscriptions to work properly
+channelName: "Vehicle",
+
+messages: {
+	vehicleInitialized: "initialized",
+	vehicleDataLoaded: "data.loaded"
+},
+
+subscriptions: {
+	onRecallNotification: "Manufacturer vehicle.notify.recall"
+}
 ```
+
+OK, so this just simply defines a message that our object might want to publish at some point, and a subscription for messages that we want to handle. This is the actual implementation of triggering that message, and handling that message subscription:
+
+```javascript
+onGetVehicleDataComplete: function (data) {
+	this.loadData(data); // we'll talk more about this function in a little bit...its awesome
+	this.trigger("vehicleDataLoaded"); // optionally, we could pass some data (anything you want/need to be attached as the data payload with this message) as a second parameter to this `trigger` call
+},
+
+onRecallNotification: function (data, envelope) {
+	// do something with the data published with this message...
+}
+```
+
+## Functions
+The BaseViewModel provides the following common functionality to all modules that extend it:
+
+### initialize
+The `initialize` function, if you define it on your object (it is optional) will be executed each time an instance of your object is created. It acts as the constructor function for your object. It can also, optionally, accept an `options` parameter. Here are two examples of how you might use the initialize function:
+
+```javascript
+// this example makes an `ajax` call to fetch vehicle data when an instance of the object is created
+initialize: function (options) {
+	this.getVehicleData();
+	this.trigger("vehicleInitialized", { vin: this.vin() });
+}
+
+// this example assumes that the data for the vehicle has already been fetched, and passes the data in to the function and loads it
+initialize: function (options) {
+	this.loadData(options);
+	this.trigger("vehicleInitialized", { vin: this.vin() });
+}
+```
+
+### loadData
+The `loadData` function can be used to simplify the loading of data (the setting of properties) on your object with data. It is a convention based function, and attempts to set the values of properties on your object that match the names of properties on the object passed to it. If the data that you wish to load in to your object does not match the properties on your object, you can use the `parse` function (see below) to transform it into the form that you need. Here are two examples:
+
+```javascript
+// passing this object to `loadData` will set the corresponding properties on your object
+var data = {
+	vin: 1234567890,
+	make: "Toyota",
+	model: "Tacoma",
+	year: "2003",
+	color: "Silver"
+};
+
+this.loadData(data);
+
+// passing the following data, without having a parse function defined on your object, would not set any properties...you would need to define a parse function to transform it in order for it to successfully set any properties on your object
+var data = {
+	VehicleIdNumber: 1234567890,
+	VehicleMake: "Toyota",
+	VehicleModel: "Tacoma",
+	Year: "2003",
+	Color: "Silver"
+};
+
+this.loadData(data);
+```
+
+### parse
+The `parse` function can be used if/when you need to transform data that is passed to the `loadData` function so that the properties of the object that `loadData` uses match the properties defined on your object. Here is an example using the data object defined in the example above:
+
+```javascript
+parse: function (data) {
+	return {
+		vin: data.VehicleIdNumber,
+		make: data.VehicleMake,
+		model: data.VehicleModel,
+		year: data.Year,
+		color: data.Color
+	};
+}
+```
+
+### serialize
+The `serialize` function wraps [the KnockoutJS `toJSON` function](http://knockoutjs.com/documentation/json-data.html). It optionally takes an object as a parameter. If an object is passed to it, it will return a JSON serialized (strinfified) version of the given object. If it is called _without_ a parameter, it will return a JSON serialized (stringified) version of your object:
+
+```javascript
+// the equivalent of calling `ko.toJSON(this.options());`
+this.serialize(this.options); // <- returns a JSON.stringified version of the `options` property of your object
+
+// the equivalent of calling `ko.toJSON(this);`
+this.serialize(); // <- returns a JSON.stringified version of the instance of `Car`
+```
+
+### raw
+The `raw` function wraps [the KnockoutJS `toJS` function](http://knockoutjs.com/documentation/json-data.html), and simply returns an unwrapped version of the instance of your object (no Knockout observables).
+
+```javascript
+// the equivalent of calling `ko.toJS(this);`
+this.raw(); // <- returns an unwrapped version of your object
+```
+
+### bind
+The `bind` function...
+
+### pushAll
+The `pushAll` function...
+
+### buildCollection
+The `buildCollection` function...
+
 
 Simple...right?
 
