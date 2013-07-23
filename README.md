@@ -7,16 +7,16 @@ Hickory is a BaseViewModel JavaScript module implementation that attempts to str
 * [Simplified AJAX call/callback definition and execution](#ajax-command-and-query-definition-and-execution)
 * [Simplified PostalJS message publication and subscription definition](#messaging---defining-messages-and-subscriptions)
 
-And provides the following (I think) useful functions:
+And provides the following (I think) useful [functions](#functions):
 
-* `initialize`
-* `loadData`
-* `parse`
-* `serialize`
-* `raw`
-* `bind`
-* `pushAll` extension to KnockoutJS ObservableArray
-* `buildCollection`
+* `initialize` [documentation](#initialize)
+* `loadData` [documentation](#loaddata)
+* `parse` [documentation](#parse)
+* `serialize` [documentation](#serialize)
+* `raw` [documentation](#raw)
+* `bind` [documentation](#bind)
+* `pushAll` extension to KnockoutJS ObservableArray [documentation](#pushall)
+* `buildCollection` [documentation](#buildcollection)
 
 Notice that I mention [KnockoutJS](http://knockoutjs.com/) and [PostalJS](https://github.com/postaljs/postal.js) specifically. Hickory was inspired by and created for a client project that makes heavy use of these two libraries, so it is tightly coupled to and dependent on them. It's also based on [jQuery](http://jquery.com/)'s Ajax implementation as well. If you're not using those libraries, it probaby won't be very useful to you.
 
