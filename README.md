@@ -5,7 +5,7 @@ Hickory is a BaseViewModel JavaScript module implementation that attempts to str
 * [A clean, simple and consistent means of defining and creating an instance of a module (constructor)](#module-definition-and-creation)
 * [KnockoutJS observable property definitions](#knockoutjs-observable-property-definitions)
 * [Simplified AJAX call/callback definition and execution](#ajax-command-and-query-definition-and-execution)
-* [Simplified PostalJS message publication and subscription definition](#messaging-defining-messages-and-subscriptions)
+* [Simplified PostalJS message publication and subscription definition](#messaging---defining-messages-and-subscriptions)
 
 And provides the following (I think) useful functions:
 
@@ -55,8 +55,9 @@ defaults: {
 	year: "", // ko.observable()
 	color: "", // ko.observable()
 	transmission: "", // ko.observable()
+	basePrice: "", // ko.observable()
 	options: [], // ko.observableArray()
-	price: "calculatePrice" // ko.computed(this.calculatePrice, this)
+	totalPrice: "computeTotalPrice" // ko.computed(this.computeTotalPrice, this)
 }
 ```
 
@@ -222,13 +223,13 @@ this.loadData(data);
 The `parse` function can be used if/when you need to transform data that is passed to the `loadData` function so that the properties of the object that `loadData` uses match the properties defined on your object. Here is an example using the data object defined in the example above:
 
 ```javascript
-parse: function (data) {
+parse: function (raw) {
 	return {
-		vin: data.VehicleIdNumber,
-		make: data.VehicleMake,
-		model: data.VehicleModel,
-		year: data.Year,
-		color: data.Color
+		vin: raw.VehicleIdNumber,
+		make: raw.VehicleMake,
+		model: raw.VehicleModel,
+		year: raw.Year,
+		color: raw.Color
 	};
 }
 ```
@@ -261,7 +262,138 @@ The `pushAll` function...
 ### buildCollection
 The `buildCollection` function...
 
+## Putting it all together
+So after all of that, here's is what the entire viewModel definition for a Car object might look like, all put together:
 
-Simple...right?
+```javascript
+var Car = BaseViewModel.extend({
+	channelName: "Vehicle",
+
+	defaults: {
+		vin: "",
+		make: "",
+		model: "",
+		year: "",
+		color: "",
+		transmission: "",
+		basePrice: "",
+		options: [],
+		totalPrice: "computeTotalPrice"
+	},
+
+	messages: {
+		vehicleInitialized: "initialized",
+		vehicleDataLoaded: "data.loaded"
+	},
+
+	subscriptions: {
+		onRecallNotification: "Manufacturer vehicle.notify.recall"
+	},
+
+	commands: {
+		logMaintenance: {
+			url: "http://toyota.com/vehicle/maintenance/log",
+			type: "post",
+			data: "buildLogMaintenanceParams",
+			done: "onLogMaintenanceComplete"
+		}
+	},
+
+	queries: {
+		getVehicleData: {
+			url: "http://toyota.com/vehicle",
+			data: function () {
+				return {
+					vin: this.vin()
+				};
+			},
+			done: "onGetVehicleDataComplete"
+		},
+
+		getMaintenanceLog: {
+			url: "http://toyota.com/vehicle/maintenance/log",
+			data: function () {
+				return {
+					vin: this.vin()
+				};
+			}
+		}
+	},
+
+	initialize: function () {
+		this.getVehicleData();
+		this.trigger("vehicleInitialized", { vin: this.vin() });
+	},
+
+	parse: function (raw) {
+		// let's assume here that the data returned from the server doesn't match up with the properties on our object here, so we need to parse it
+		var parsed = {
+			vin: raw.VehicleIdNumber,
+			make: raw.VehicleMake,
+			model: raw.VehicleModel,
+			year: raw.Year,
+			color: raw.Color
+		};
+
+		return parsed;
+	},
+
+	computeTotalPrice: function () {
+		var totalPrice = this.basePrice();
+
+		_.each(this.options(), function (item) {
+			totalPrice += item.price();
+		});
+
+		return totalPrice;
+	},
+
+	logMaintenance: function () {
+		this.execute(this.commands.logMaintenance);
+	},
+
+	getVehicleData: function () {
+		this.execute(this.queries.getVehicleData);
+	},
+
+	getMaintenanceLog: function () {
+		this.execute(this.queries.getMaintenanceLog)
+			.done(this.onGetMaintenanceLogComplete);
+	},
+
+	buildLogMaintenanceParams: function () {
+		var params = {
+			vin: this.vin(),
+			maintenanceType: "Oil Change"
+		};
+
+		return params;
+	},
+
+	onLogMaintenanceComplete: function (data) {
+		// do something with the results from the server (data)...
+	},
+
+	onGetVehicleDataComplete: function (data) {
+		this.loadData(data);
+	},
+
+	onGetMaintenanceLogComplete: function (data) {
+		// do something with the returned maintenance log data...
+	},
+
+	onGetVehicleDataComplete: function (data) {
+		this.loadData(data);
+		this.trigger("vehicleDataLoaded");
+	},
+
+	onRecallNotification: function (data, envelope) {
+		// do something with the data published with this message...
+	}
+});
+```
+
+
+So there ya go. Simple enough...right?
 
 <img src="http://i.cloudup.com/IAVyk1qYvL.gif" alt="simple...right?" title="simple...right?"/>
